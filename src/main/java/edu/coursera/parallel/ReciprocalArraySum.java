@@ -125,7 +125,14 @@ public final class ReciprocalArraySum {
 
         @Override
         protected void compute() {
-            // TODO
+            double sum = 0;
+
+            // Compute sum of reciprocals of array elements
+            for (int i = startIndexInclusive; i < endIndexExclusive; i++) {
+                sum += 1 / input[i];
+            }
+
+            return sum;
         }
     }
 
@@ -140,15 +147,7 @@ public final class ReciprocalArraySum {
      */
     protected static double parArraySum(final double[] input) {
         assert input.length % 2 == 0;
-
-        double sum = 0;
-
-        // Compute sum of reciprocals of array elements
-        for (int i = 0; i < input.length; i++) {
-            sum += 1 / input[i];
-        }
-
-        return sum;
+        return parManyTaskArraySum(input, 2);
     }
 
     /**
@@ -163,13 +162,14 @@ public final class ReciprocalArraySum {
      */
     protected static double parManyTaskArraySum(final double[] input,
             final int numTasks) {
-        double sum = 0;
-
-        // Compute sum of reciprocals of array elements
-        for (int i = 0; i < input.length; i++) {
-            sum += 1 / input[i];
+        assert numTasks > input.length : "more tasks than array length" ; 
+        ArrayList<ReciprocalArraySumTask> tasks = new ArrayList<>(numTasks);
+        for(int i = 0 ; i < numTasks; ++i){
+            int startIndex = getChunkStartInclusive(i, numTasks, input.length); 
+            int endIndex = getChunkEndExclusive(i, numTasks, input.length);
+            tasks.add(new ReciprocalArraySumTask(input, startIndex, endIndex)); 
         }
-
-        return sum;
+        ForkJoinPool.commonPool().invokeAll(tasks);
+        return tasks.stream().map(RecursiveAction::get).sum(); 
     }
 }
