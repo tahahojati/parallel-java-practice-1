@@ -164,7 +164,8 @@ public final class ReciprocalArraySum {
      */
     protected static double parManyTaskArraySum(final double[] input,
             final int numTasks) {
-        assert numTasks > input.length : "more tasks than array length" ; 
+        assert numTasks <= input.length : "more tasks than array length" ; 
+
         ArrayList<ReciprocalArraySumTask> tasks = new ArrayList<>(numTasks);
         for(int i = 0 ; i < numTasks; ++i){
             int startIndex = getChunkStartInclusive(i, numTasks, input.length); 
